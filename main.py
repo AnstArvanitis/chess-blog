@@ -14,13 +14,22 @@ from dotenv import load_dotenv
 # Import forms from local forms.py
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 
+# --- ENVIRONMENT CONFIGURATION ---
+# Load environment variables from .env file only if the file exists (Local Development).
+# On Render, variables are loaded from the Dashboard settings.
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv is not installed/needed in production
+
+
 '''
 ===========================================================
 APP CONFIGURATION & SETUP
 ===========================================================
 '''
 
-load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
