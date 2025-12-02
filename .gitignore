@@ -12,3 +12,4 @@ build/
 .env
 .idea/
 posts.db
+.vscode/settings.json
