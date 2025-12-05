@@ -300,11 +300,12 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact",methods=['GET','POST'])
+@app.route("/contact", methods=["GET", "POST"])
 def contact():
     """ 
     Renders the contact page. 
     Handles POST requests to send real emails via SMTP using Gmail.
+    Includes a fallback mechanism to prevent server crashes if SMTP fails.
     """
     if request.method == "POST":
         data = request.form
@@ -315,34 +316,42 @@ def contact():
         send_phone = data["phone"]
         send_message = data["message"]
         
-        # 2. Fetch email credentials from Environment Variables (Render/Local .env)
+        # 2. Log the attempt for debugging (visible in Render logs)
+        print(f"--- ATTEMPTING EMAIL ---")
+        print(f"From: {send_name} ({send_email})")
+        print(f"Message: {send_message}")
+        
+        # 3. Fetch credentials from Environment Variables
         my_email = os.environ.get("MY_EMAIL")
         my_password = os.environ.get("MY_EMAIL_PASSWORD")
 
-        # 3. Connect to SMTP Server and send the email
-        # Wrapped in try/except to prevent the app from crashing if SMTP fails
-        try:
-            with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
-                connection.starttls() # Secure the connection
-                connection.login(user=my_email, password=my_password)
-                
-                # Construct the email body
-                email_msg = f"Subject:New Message from Chess Blog\n\nName: {send_name}\nEmail: {send_email}\nPhone: {send_phone}\nMessage: {send_message}"
-                
-                # Send the email (UTF-8 encoding handles non-ASCII characters like Greek)
-                connection.sendmail(
-                    from_addr=my_email,
-                    to_addrs=my_email, # Send to yourself
-                    msg=email_msg.encode('utf-8')
-                )
-                print("Successfully sent email")
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            
+        # 4. Attempt to send email, but don't crash if it fails
+        if my_email and my_password:
+            try:
+                # Added timeout=10s to prevent Gunicorn worker timeout
+                with smtplib.SMTP("smtp.gmail.com", port=587, timeout=10) as connection:
+                    connection.starttls() # Secure the connection
+                    connection.login(user=my_email, password=my_password)
+                    
+                    email_msg = f"Subject:Chess Blog Contact\n\nName: {send_name}\nEmail: {send_email}\nPhone: {send_phone}\nMessage: {send_message}"
+                    
+                    connection.sendmail(
+                        from_addr=my_email,
+                        to_addrs=my_email,
+                        msg=email_msg.encode('utf-8')
+                    )
+                    print("✅ EMAIL SENT SUCCESSFULLY!")
+            except Exception as e:
+                # Log the specific error for the admin, but keep the site running
+                print(f"❌ SMTP FAILED (Server prevented sending): {e}")
+                print("⚠️ Continuing without sending email to prevent crash.")
+        else:
+            print("⚠️ No email credentials found in environment variables. Skipped sending.")
+
+        # 5. Return success message to the user (Good UX)
         return render_template("contact.html", msg_sent=True)
         
     return render_template("contact.html", msg_sent=False)
-
 
 if __name__ == "__main__":
     app.run(debug=False, port=5002)
