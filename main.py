@@ -1,15 +1,16 @@
 from datetime import date
-from flask import Flask, abort, render_template, redirect, url_for, flash
+from flask import Flask, abort, render_template, redirect, url_for, flash , request
 from flask_bootstrap import Bootstrap5
 from flask_ckeditor import CKEditor
 from flask_gravatar import Gravatar
-from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user
+from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import smtplib
 # Import forms from local forms.py
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 
@@ -301,7 +302,46 @@ def about():
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    """ 
+    Renders the contact page. 
+    Handles POST requests to send real emails via SMTP using Gmail.
+    """
+    if request.method == "POST":
+        data = request.form
+        
+        # 1. Retrieve data from the submitted form
+        send_name = data["name"]
+        send_email = data["email"]
+        send_phone = data["phone"]
+        send_message = data["message"]
+        
+        # 2. Fetch email credentials from Environment Variables (Render/Local .env)
+        my_email = os.environ.get("MY_EMAIL")
+        my_password = os.environ.get("MY_EMAIL_PASSWORD")
+
+        # 3. Connect to SMTP Server and send the email
+        # Wrapped in try/except to prevent the app from crashing if SMTP fails
+        try:
+            with smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+                connection.starttls() # Secure the connection
+                connection.login(user=my_email, password=my_password)
+                
+                # Construct the email body
+                email_msg = f"Subject:New Message from Chess Blog\n\nName: {send_name}\nEmail: {send_email}\nPhone: {send_phone}\nMessage: {send_message}"
+                
+                # Send the email (UTF-8 encoding handles non-ASCII characters like Greek)
+                connection.sendmail(
+                    from_addr=my_email,
+                    to_addrs=my_email, # Send to yourself
+                    msg=email_msg.encode('utf-8')
+                )
+                print("Successfully sent email")
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            
+        return render_template("contact.html", msg_sent=True)
+        
+    return render_template("contact.html", msg_sent=False)
 
 
 if __name__ == "__main__":
