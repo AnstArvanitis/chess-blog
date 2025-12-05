@@ -5,7 +5,7 @@ This project serves as the Capstone for the "100 Days of Code" Bootcamp, demonst
 
 🔗 **Live Demo:** (https://chess-blog.onrender.com/)
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=App+Screenshot+Coming+Soon)
+![Project Screenshot](app-preview.PNG)
 
 ## 🛠️ Tech Stack
 
