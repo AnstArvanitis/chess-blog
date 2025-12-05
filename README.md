@@ -1,65 +1,71 @@
 # The Grandmaster's Log ♟️
 
-A multi-user blog application built with Python and Flask.
-This project was developed as the **Capstone Project** for the "100 Days of Code" Python Bootcamp (Day 69). It features a full authentication system, role-based access control (Admin vs. Users), and a relational database structure.
+A robust, multi-user blog application built with **Python** and **Flask**, deployed on **Render**.
+This project serves as the Capstone for the "100 Days of Code" Bootcamp, demonstrating Full-Stack development skills, relational database management, and secure authentication flows.
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=App+Screenshot+Placeholder) 
-*(Note: Replace this line with a real screenshot of your app)*
+🔗 **Live Demo:** (https://chess-blog.onrender.com/)
 
-## 🚀 Features
+![Project Screenshot](https://via.placeholder.com/800x400?text=App+Screenshot+Coming+Soon)
 
-* **User Authentication:** Secure Login/Register system using `Werkzeug` for password hashing and `Flask-Login` for session management.
-* **Role-Based Access:**
-    * **Admin (ID=1):** Can Create, Edit, and Delete posts.
-    * **Registered Users:** Can read posts and leave comments.
-    * **Guests:** Can only read posts.
-* **Database Relationships (SQLAlchemy 2.0):**
-    * Implemented **One-to-Many** relationships connecting Users, Blog Posts, and Comments.
-* **Rich Text Editor:** Integrated `Flask-CKEditor` for writing styled blog posts and comments.
-* **Profile Avatars:** Users automatically get profile pictures via `Flask-Gravatar`.
-* **Styling:** Responsive design using Bootstrap 5 (`Flask-Bootstrap`).
+## 🛠️ Tech Stack
 
-## 🛠️ Tech Stack & Requirements
+* **Backend:** Python 3.11, Flask 2.3
+* **Database:** PostgreSQL (Production), SQLite (Development), SQLAlchemy ORM
+* **Frontend:** Jinja2 Templating, Bootstrap 5, CKEditor (Rich Text)
+* **Authentication:** Flask-Login, Werkzeug Security (Hashing & Salting)
+* **DevOps:** Git, GitHub, Render (PaaS), Gunicorn
 
-* **Python 3.x**
-* **Flask 2.3.2** (Core Framework)
-* **SQLAlchemy 2.0.25** (ORM & Database Management)
-* **SQLite** (Database)
-* **WTForms** (Form Validation)
+## 🚀 Key Features
 
-## ⚙️ Installation & Setup
+* **Role-Based Access Control (RBAC):**
+    * **Admin:** Full CRUD capabilities (Create, Read, Update, Delete posts).
+    * **Users:** Can read posts and leave comments.
+    * **Guests:** Read-only access.
+* **Secure Authentication:** User registration and login system with password hashing.
+* **Relational Data Structure:** Implemented **One-to-Many** relationships linking Users to Posts and Comments.
+* **Dynamic Content:** Rich text editing for posts and comments using CKEditor.
+* **Profile Avatars:** Automated avatar generation based on user email (Gravatar).
+* **Production Grade:** Configured with `gunicorn` for WSGI serving and Environment Variables for security.
+
+## 🔒 Security & Configuration
+
+This project implements industry-standard security practices:
+* **Environment Variables:** Sensitive data (API Keys, DB URIs) are hidden using `python-dotenv` locally and Environment Config on Render.
+* **Database Switching:** Automatically switches between SQLite (Local) and PostgreSQL (Live) based on the environment.
+* **Safe SMTP Handling:** The contact form includes a fail-safe mechanism. It attempts to send emails via SMTP but gracefully falls back to logging if the connection is blocked by provider security policies, preventing server crashes (Error 500).
+
+## ⚙️ Local Installation
+
+If you want to run this locally:
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/chess-blog.git](https://github.com/YOUR_USERNAME/chess-blog.git)
+    git clone https://github.com/AnstArvanitis/chess-blog.git
     cd chess-blog
     ```
 
-2.  **Create a Virtual Environment** (Optional but recommended)
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use: venv\Scripts\activate
-    ```
-
-3.  **Install Dependencies**
+2.  **Install Dependencies**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Run the Application**
+3.  **Setup Environment Variables**
+    Create a `.env` file in the root directory and add:
+    ```text
+    FLASK_KEY=your_secret_key
+    DB_URI=sqlite:///posts.db
+    MY_EMAIL=your_email@gmail.com
+    MY_EMAIL_PASSWORD=your_app_password
+    ```
+
+4.  **Run the App**
     ```bash
     python main.py
     ```
-    The app will run at `http://127.0.0.1:5002/`.
 
-## 💡 Key Learnings
+## 👨‍💻 Author
 
-Building this project helped me understand:
-* How to structure a **Relational Database** properly (handling Foreign Keys and `back_populates`).
-* The importance of **Route Protection** using custom decorators (`@admin_only`).
-* How to bridge the Frontend (Jinja2 templates) with Backend logic effectively.
-* Handling "Breaking Changes" in database schemas during development.
+**Anastasis** *Junior Python Developer & AUEB Graduate (Information Systems)* Building tools that bridge business logic with technical execution.
 
-## 📝 License
-
-This project is for educational purposes. Design template by [Start Bootstrap](https://startbootstrap.com/).
+---
+*Developed as part of the 100 Days of Code Challenge.*
