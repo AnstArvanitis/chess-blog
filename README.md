@@ -34,9 +34,26 @@ This project implements industry-standard security practices:
 * **Database Switching:** Automatically switches between SQLite (Local) and PostgreSQL (Live) based on the environment.
 * **Safe SMTP Handling:** The contact form includes a fail-safe mechanism. It attempts to send emails via SMTP but gracefully falls back to logging if the connection is blocked by provider security policies, preventing server crashes (Error 500).
 
-## ⚙️ Local Installation
+## ⚙️ Installation & Usage
 
-If you want to run this locally:
+### Option 1: Run with Docker (The DevOps Way) 🐳
+If you have Docker installed, you can run the application without installing Python dependencies manually.
+
+1.  **Build the Image**
+    ```bash
+    docker build -t chess-blog .
+    ```
+
+2.  **Run the Container**
+    ```bash
+    docker run -p 5002:5002 chess-blog
+    ```
+    The app will be available at `http://localhost:5002`.
+
+---
+
+### Option 2: Local Installation (Standard)
+If you prefer running it directly on your machine:
 
 1.  **Clone the repository**
     ```bash
