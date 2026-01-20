@@ -73,10 +73,6 @@ class User(UserMixin, db.Model):
 
 
 class BlogPost(db.Model):
-    """
-    BlogPost Table: Stores blog articles.
-    Child of 'User' (Author). Parent to 'Comment'.
-    """
     __tablename__ = "blog_posts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     
@@ -84,21 +80,18 @@ class BlogPost(db.Model):
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
     author = relationship("User", back_populates="posts")
     
+    # --- ΠΡΟΣΘΕΣΕ ΑΥΤΗ ΤΗ ΓΡΑΜΜΗ (Σχέση με τα σχόλια) ---
+    comments = relationship("Comment", back_populates="parent_post")
+    
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     subtitle: Mapped[str] = mapped_column(String(250), nullable=False)
     date: Mapped[str] = mapped_column(String(250), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     img_url: Mapped[str] = mapped_column(String(250), nullable=False)
-    
-    # Relationship to Comments
-    comments = relationship("Comment", back_populates="parent_post")
+   
 
 
 class Comment(db.Model):
-    """
-    Comment Table: Stores user comments on blog posts.
-    Child of both 'User' (Commenter) and 'BlogPost' (Parent Post).
-    """
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
@@ -106,6 +99,9 @@ class Comment(db.Model):
     # Connection to User (Comment Author)
     author_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("users.id"))
     comment_author = relationship("User", back_populates="comments")
+    
+    # --- ΔΙΕΓΡΑΨΕ ΤΗ ΛΑΘΟΣ ΓΡΑΜΜΗ ΠΟΥ ΥΠΗΡΧΕ ΕΔΩ ---
+    # (comments = relationship("Comment"...)) <--- ΣΒΗΣ' ΤΟ ΑΥΤΟ!
     
     # Connection to BlogPost (Parent Post)
     post_id: Mapped[int] = mapped_column(Integer, db.ForeignKey("blog_posts.id"))
@@ -119,7 +115,7 @@ with app.app_context():
 
 '''
 ===========================================================
-HELPER FUNCTIONS & DECORATORS
+HELPER FUN,CTIONS & DECORATORS
 ===========================================================
 '''
 @login_manager.user_loader
